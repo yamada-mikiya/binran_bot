@@ -36,10 +36,10 @@ except Exception as e:
 def load_and_build_vector_store():
     try:
         with open("2024f.pdf", "rb") as f:
-        reader = PdfReader(f)
-        raw_text = ""
-        for page in reader.pages:
-            raw_text += page.extract_text()
+            reader = PdfReader(f)
+            raw_text = ""
+            for page in reader.pages:
+                raw_text += page.extract_text()
     except FileNotFoundError:
         st.error("エラー: `2024f.pdf` ファイルが見つかりません。")
         return None
