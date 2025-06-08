@@ -7,7 +7,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 import os
-
+from PyPDF2 import PdfReader
 
 # --- 1. 初期設定とUI ---
 st.set_page_config(page_title="神戸大学工学部 学生便覧チャットボット", page_icon="📚")
@@ -35,8 +35,11 @@ except Exception as e:
 @st.cache_resource
 def load_and_build_vector_store():
     try:
-        with open("2024f.pdf", "r", encoding="utf-8") as f:
-            raw_text = f.read()
+        with open("2024f.pdf", "rb") as f:
+        reader = PdfReader(f)
+        raw_text = ""
+        for page in reader.pages:
+            raw_text += page.extract_text()
     except FileNotFoundError:
         st.error("エラー: `2024f.pdf` ファイルが見つかりません。")
         return None
