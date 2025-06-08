@@ -2,11 +2,12 @@ import streamlit as st
 import google.generativeai as genai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma  # ★★★【最重要変更点】langchain_communityからインポートします
+from langchain_community.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 import os
+
 
 # --- 1. 初期設定とUI ---
 st.set_page_config(page_title="神戸大学工学部 学生便覧チャットボット", page_icon="📚")
@@ -49,7 +50,7 @@ def load_and_build_vector_store():
     
     try:
         embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
-        vector_store = Chroma.from_texts(text_chunks, embedding=embeddings)
+         vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)  # ← ここも修正
         return vector_store
     except Exception as e:
         st.error(f"ベクトルストアの構築中にエラーが発生しました。APIキーやライブラリの互換性を確認してください。エラー詳細: {e}")
