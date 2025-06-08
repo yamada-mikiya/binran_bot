@@ -50,7 +50,7 @@ def load_and_build_vector_store():
     
     try:
         embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
-         vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)  # ← ここも修正
+        vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)  # ← ここも修正
         return vector_store
     except Exception as e:
         st.error(f"ベクトルストアの構築中にエラーが発生しました。APIキーやライブラリの互換性を確認してください。エラー詳細: {e}")
