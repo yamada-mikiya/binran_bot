@@ -35,10 +35,10 @@ except Exception as e:
 @st.cache_resource
 def load_and_build_vector_store():
     try:
-        with open("kobe_u_handbook.txt", "r", encoding="utf-8") as f:
+        with open("2024f.pdf, "r", encoding="utf-8") as f:
             raw_text = f.read()
     except FileNotFoundError:
-        st.error("エラー: `kobe_u_handbook.txt` ファイルが見つかりません。")
+        st.error("エラー: `2024f.pdf` ファイルが見つかりません。")
         return None
 
     text_splitter = RecursiveCharacterTextSplitter(
