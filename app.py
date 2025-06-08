@@ -3,7 +3,7 @@ import google.generativeai as genai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import Chroma  # ★★★【最重要変更点】langchain_communityからインポートします
-from langchain.chains.Youtubeing import load_qa_chain
+from langchain.chains.question_answering import load_qa_chain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 import os
