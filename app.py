@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain.vectorstores import Chroma  # 変更点1: FAISSの代わりにChromaをインポート
+from langchain_community.vectorstores import Chroma  # ★★★【最重要変更点】langchain_communityからインポートします
 from langchain.chains.Youtubeing import load_qa_chain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
@@ -24,7 +24,11 @@ if not GOOGLE_API_KEY:
     st.stop()
 
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
-genai.configure(api_key=GOOGLE_API_KEY)
+try:
+    genai.configure(api_key=GOOGLE_API_KEY)
+except Exception as e:
+    st.error(f"Google APIキーの設定中にエラーが発生しました: {e}")
+    st.stop()
 
 # --- 3. データ読み込みとベクトルストアの構築 ---
 @st.cache_resource
@@ -42,11 +46,15 @@ def load_and_build_vector_store():
         length_function=len,
     )
     text_chunks = text_splitter.split_text(raw_text)
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
     
-    # 変更点2: FAISS.from_texts を Chroma.from_texts に変更
-    vector_store = Chroma.from_texts(text_chunks, embedding=embeddings)
-    return vector_store
+    try:
+        embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+        vector_store = Chroma.from_texts(text_chunks, embedding=embeddings)
+        return vector_store
+    except Exception as e:
+        st.error(f"ベクトルストアの構築中にエラーが発生しました。APIキーやライブラリの互換性を確認してください。エラー詳細: {e}")
+        return None
+
 
 vector_store = load_and_build_vector_store()
 if vector_store is None:
@@ -93,7 +101,6 @@ if user_question := st.chat_input("質問を入力してください...（例: �
     with st.chat_message("assistant"):
         with st.spinner("AIが学生便覧を確認しています..."):
             try:
-                # 変更点3: Chromaは .as_retriever() を使うのが一般的です
                 retriever = vector_store.as_retriever(search_kwargs={"k": 5})
                 docs = retriever.invoke(user_question)
 
@@ -109,8 +116,7 @@ if user_question := st.chat_input("質問を入力してください...（例: �
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
             except Exception as e:
-                st.error(f"エラーが発生しました: {e}")
-                st.info("APIキーが有効か、または利用制限に達していないかご確認ください。")
+                st.error(f"回答生成中にエラーが発生しました: {e}")
 
 # --- 6. 注意事項 ---
 st.sidebar.markdown("---")
